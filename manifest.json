@@ -11,7 +11,11 @@
   },
   "default_locale": "en",
   "permissions": [
+    "https://i.annihil.us/*",
     "https://read.marvel.com/*"
+  ],
+  "web_accessible_resources": [
+    "src/embedded/embedded.js"
   ],
   "content_scripts": [
     {
