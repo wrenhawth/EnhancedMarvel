@@ -1,5 +1,15 @@
 var readyStateCheckInterval, loadedThumbInterval;
 var images = [];
+var twopageButton;
+buttonWrapper = document.createElement('li');
+twopageButton = document.createElement('iframe');
+twopageButton.id='twoPage';
+twopageButton.src = chrome.extension.getURL('twoPageBtn.html');
+twopageButton.frameBorder = 0;
+twopageButton.height = '40px';
+buttonWrapper.className = 'icon';
+buttonWrapper.appendChild(twopageButton);
+
 chrome.extension.sendMessage({}, function(response) {
 	var pages = [];
 	var imgSrcList = [];
@@ -18,12 +28,12 @@ chrome.extension.sendMessage({}, function(response) {
 			// This part of the script triggers when page is done loading
 			console.log('Hello. This message was sent from scripts/inject.js');
 			// ----------------------------------------------------------
-
+			// $('#footer>footer>nav>ul').append(buttonWrapper);
 			/* We'll embed a script for any functionality that requires access to
-				 window objects */
-			var embeddedScript = document.createElement('script');
-			embeddedScript.src = chrome.extension.getURL('src/embedded/embedded.js');
-			(document.head||document.documentElement).appendChild(embeddedScript);
+			window objects */
+			embedExtensionScript('js/jquery/jquery.min.js', function() {
+				embedExtensionScript('src/embedded/embedded.js');
+			});
 			var pageImages = $('#page>svg');
 			pageImages.each(function(index, value){
 				var observer = new MutationObserver(function(mutations){
@@ -35,7 +45,7 @@ chrome.extension.sendMessage({}, function(response) {
 						if (node.nodeName == 'image'){
 							processPage(node);
 							currentPlace = filterSplashPages(currentPlace);
-							console.log(currentPlace);
+							//console.log(currentPlace);
 							showPages(currentPlace);
 							locked = false;
 						}
@@ -48,13 +58,13 @@ chrome.extension.sendMessage({}, function(response) {
 
 				observer.observe(value, config);
 			});
-			loadedThumbInterval = setInterval(loadedCallback, 1000);
+			//loadedThumbInterval = setInterval(loadedCallback, 1000);
 		}
 	}
 
 	function loadedCallback(){
 		/* We'll use the thumbnails of all the comic pages to determine
-			 the order of the pages in the comic */
+		the order of the pages in the comic */
 		var pageThumbs = $('#allPages>.thumbs-wrap>.thumbs.readable');
 		if (pageThumbs.length > 0 && !pageThumbs.hasClass('loading')){
 			clearInterval(loadedThumbInterval);

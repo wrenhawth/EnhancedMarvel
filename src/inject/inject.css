@@ -2,12 +2,27 @@
  * Place your custom CSS styles here.
  **/
 
-.leftPage{
-  left: -12.5% !important;
+.leftPage, .rightPage{
+  width: 50% !important;
+  min-width: 50% !important;
   display: block !important;
 }
 
+.leftPage{
+  left: -1% !important;
+  transform: right !important;
+}
+
 .rightPage{
-  left: 12.5% !important;
-  display: block !important;
+  left: 51% !important;
+}
+
+#twoPage{
+  display: list-item;
+  height: 40px;
+  width: 34px;
+}
+
+footer nav ul{
+  width: 300px;
 }

@@ -1,20 +1,20 @@
 {
-  "name": "CHANGE THIS : Extension boilerplate",
-  "version": "0.0.1",
+  "name": "Enhanced Marvel",
+  "version": "0.0.2",
   "manifest_version": 2,
-  "description": "This extension was created with the awesome extensionizr.com",
-  "homepage_url": "http://extensionizr.com",
+  "description": "Extension to add two-page view (and maybe more) to Marvel Unlimited",
+  "homepage_url": "https://github.com/jrobusto/EnhancedMarvel",
   "icons": {
     "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
+    "48": "icons/icon48.png"
   },
   "default_locale": "en",
   "permissions": [
     "https://i.annihil.us/*",
-    "https://read.marvel.com/*"
+    "*://read.marvel.com/*"
   ],
   "web_accessible_resources": [
+    "js/jquery/jquery.min.js",
     "src/embedded/embedded.js"
   ],
   "content_scripts": [
@@ -32,6 +32,7 @@
       ],
       "js": [
         "js/jquery/jquery.js",
+        "src/inject/injection.tools.js",
         "src/inject/inject.js"
       ]
     }
