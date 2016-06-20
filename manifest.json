@@ -10,9 +10,15 @@
   },
   "default_locale": "en",
   "permissions": [
+    "storage",
     "https://i.annihil.us/*",
     "*://read.marvel.com/*"
   ],
+  "options_page": "options.html",
+  "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
+  },
   "web_accessible_resources": [
     "js/jquery/jquery.min.js",
     "src/embedded/embedded.js"

@@ -16,7 +16,7 @@ function overwriteControls(model, controls){
       var a = Math.min(last + 1, bookLength - 1);
       var b = Math.min(last + 2, bookLength - 1);
       resetView();
-      if (a != b && !pages[a].splashPage && !pages[b].splashPage){
+      if (twoPage && a != b && !pages[a].splashPage && !pages[b].splashPage){
         model.once('updateBookLoc', function(event){
           displayTwoPages(a, b);
           _.delay(displayTwoPages, 600, a, b);
@@ -38,7 +38,7 @@ function overwriteControls(model, controls){
       var b = Math.max(last - 1, 0);
       console.log(a, b);
       resetView();
-      if (a > 0 && a != b && !pages[a].splashPage && !pages[b].splashPage){
+      if (twoPage && a > 0 && a != b && !pages[a].splashPage && !pages[b].splashPage){
         model.once('updateBookLoc', function(event){
           _.delay(displayTwoPages, 600, a, b);
           displayTwoPages(a, b);
@@ -95,10 +95,13 @@ function processPages(pages){
 
 /* Allow extension use of jQuery 3 without interfering with native jQuery */
 j3 = jQuery.noConflict(true);
+var body = j3('body');
 /* Core variables for manipulating and analyzing pages */
 var rocket = window.rocket;
 var model = rocket.models.model;
 var controls = window.rocket.models.controlsModel;
+var disablePanel = body.data('disablepanel');
+var twoPage = body.data('twopage');
 
 var pages = model.attributes.pages;
 
@@ -107,11 +110,15 @@ if (pages.length == 0){
   model.on('loaded', function(){
     pages = rocket.models.model.attributes.pages;
     processPages(pages);
-    disableSmartPanel(controls);
+    if (disablePanel){
+      disableSmartPanel(controls);
+    }
     overwriteControls(model, controls);
   });
 }else{
   processPages(pages);
-  disableSmartPanel(controls);
+  if (disablePanel){
+    disableSmartPanel(controls);
+  }
   overwriteControls(model, controls);
 }
