@@ -27,7 +27,6 @@ chrome.extension.sendMessage({}, function(response) {
 		    disablePanel: true,
 		    twoPage: true
 		  }, function(items) {
-				console.log(items);
 				var body = $('body');
 				body.attr('data-disablepanel', items.disablePanel);
 				body.attr('data-twopage', items.twoPage);

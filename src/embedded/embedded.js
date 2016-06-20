@@ -36,12 +36,11 @@ function overwriteControls(model, controls){
       }
       var a = Math.max(last - 2, 0);
       var b = Math.max(last - 1, 0);
-      console.log(a, b);
       resetView();
       if (twoPage && a > 0 && a != b && !pages[a].splashPage && !pages[b].splashPage){
         model.once('updateBookLoc', function(event){
-          _.delay(displayTwoPages, 600, a, b);
           displayTwoPages(a, b);
+          _.delay(displayTwoPages, 600, a, b);
         });
         model.goToLocation(b, 0);
       }else{
@@ -59,6 +58,7 @@ function resetView(){
     j3(value).removeAttr('preserveAspectRatio');
   });
 }
+
 function displayTwoPages(a, b){
   resetView();
   var firstPage, secondPage;
@@ -93,32 +93,32 @@ function processPages(pages){
 
 }
 
-/* Allow extension use of jQuery 3 without interfering with native jQuery */
-j3 = jQuery.noConflict(true);
-var body = j3('body');
-/* Core variables for manipulating and analyzing pages */
-var rocket = window.rocket;
-var model = rocket.models.model;
-var controls = window.rocket.models.controlsModel;
-var disablePanel = body.data('disablepanel');
-var twoPage = body.data('twopage');
-
-var pages = model.attributes.pages;
-
-/* Pages might or might not be loaded at this point */
-if (pages.length == 0){
-  model.on('loaded', function(){
-    pages = rocket.models.model.attributes.pages;
-    processPages(pages);
-    if (disablePanel){
-      disableSmartPanel(controls);
-    }
-    overwriteControls(model, controls);
-  });
-}else{
+var loadedCallback = function(){
+  pages = model.attributes.pages;
   processPages(pages);
   if (disablePanel){
     disableSmartPanel(controls);
   }
   overwriteControls(model, controls);
+};
+
+/* Allow extension use of jQuery 3 without interfering with native jQuery */
+j3 = jQuery.noConflict(true);
+var body = j3('body');
+
+/* Retrieve options for extension */
+var disablePanel = body.data('disablepanel');
+var twoPage = body.data('twopage');
+
+/* Core variables for manipulating and analyzing pages */
+var rocket = window.rocket;
+var model = rocket.models.model;
+var controls = rocket.models.controlsModel;
+var pages = model.attributes.pages;
+
+/* Pages might or might not be loaded at this point */
+if (pages.length == 0){
+  model.on('loaded', loadedCallback);
+}else{
+  loadedCallback();
 }
