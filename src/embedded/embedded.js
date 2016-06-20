@@ -10,24 +10,35 @@ function overwriteControls(model, controls){
     oneNext: controls.goToNext,
     onePrevious: controls.goToPrevious,
     goToNext: function(){
+      if (controls.attributes.smartPanel){
+        controls.oneNext();
+        return;
+      }
       var pages = model.attributes.pages;
       var bookLength = pages.length;
       var last = model.loc.pageIdx;
       var a = Math.min(last + 1, bookLength - 1);
       var b = Math.min(last + 2, bookLength - 1);
-      resetView();
       if (twoPage && a != b && !pages[a].splashPage && !pages[b].splashPage){
         model.once('updateBookLoc', function(event){
+          resetView();
           displayTwoPages(a, b);
-          _.delay(displayTwoPages, 600, a, b);
         });
         model.goToLocation(b, 0);
       }else{
+        model.once('updateBookLoc', function(event){
+          hidePanels();
+          //_.delay(resetView, 600);
+        })
+        hidePanels();
         controls.oneNext();
-        _.delay(resetView, 400);
       }
     },
     goToPrevious: function(){
+      if (controls.attributes.smartPanel){
+        controls.onePrevious();
+        return;
+      }
       var pages = model.attributes.pages;
       var bookLength = pages.length;
       var last = model.loc.pageIdx;
@@ -36,16 +47,15 @@ function overwriteControls(model, controls){
       }
       var a = Math.max(last - 2, 0);
       var b = Math.max(last - 1, 0);
-      resetView();
       if (twoPage && a > 0 && a != b && !pages[a].splashPage && !pages[b].splashPage){
         model.once('updateBookLoc', function(event){
+          resetView();
           displayTwoPages(a, b);
-          _.delay(displayTwoPages, 600, a, b);
         });
         model.goToLocation(b, 0);
       }else{
+        resetView();
         model.goToLocation(b, 0);
-        _.delay(resetView, 250);
       }
     }
   });
@@ -55,10 +65,14 @@ function resetView(){
   j3('svg').each(function(index, value){
     j3(value).removeClass('leftPage');
     j3(value).removeClass('rightPage');
+    j3(value).removeClass('hidePage');
     j3(value).removeAttr('preserveAspectRatio');
   });
 }
 
+function hidePanels(){
+  j3('svg.leftPage, svg.rightPage').addClass('hidePage');
+}
 function displayTwoPages(a, b){
   resetView();
   var firstPage, secondPage;

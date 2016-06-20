@@ -10,11 +10,14 @@
 
 .leftPage{
   left: -1% !important;
-  transform: right !important;
 }
 
 .rightPage{
   left: 51% !important;
+}
+
+.hidePage{
+  display: none !important;
 }
 
 #twoPage{
