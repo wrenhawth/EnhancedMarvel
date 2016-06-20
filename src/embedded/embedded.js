@@ -10,16 +10,19 @@ function overwriteControls(model, controls){
     oneNext: controls.goToNext,
     onePrevious: controls.goToPrevious,
     goToNext: function(){
-      if (controls.attributes.smartPanel){
-        controls.oneNext();
-        return;
-      }
       var pages = model.attributes.pages;
       var bookLength = pages.length;
       var last = model.loc.pageIdx;
       var a = Math.min(last + 1, bookLength - 1);
       var b = Math.min(last + 2, bookLength - 1);
-      if (twoPage && a != b && !pages[a].splashPage && !pages[b].splashPage){
+      model.loc.leftIdx = a;
+
+      if (controls.attributes.smartPanel){
+        controls.oneNext();
+        return;
+      }
+
+      if (twoPage && areSinglePages(a, b)){
         model.once('updateBookLoc', function(event){
           resetView();
           displayTwoPages(a, b);
@@ -27,18 +30,13 @@ function overwriteControls(model, controls){
         model.goToLocation(b, 0);
       }else{
         model.once('updateBookLoc', function(event){
-          hidePanels();
-          //_.delay(resetView, 600);
+          hidePages();
         })
-        hidePanels();
+        hidePages();
         controls.oneNext();
       }
     },
     goToPrevious: function(){
-      if (controls.attributes.smartPanel){
-        controls.onePrevious();
-        return;
-      }
       var pages = model.attributes.pages;
       var bookLength = pages.length;
       var last = model.loc.pageIdx;
@@ -47,7 +45,16 @@ function overwriteControls(model, controls){
       }
       var a = Math.max(last - 2, 0);
       var b = Math.max(last - 1, 0);
-      if (twoPage && a > 0 && a != b && !pages[a].splashPage && !pages[b].splashPage){
+      model.loc.leftIdx = a;
+
+      if (controls.attributes.smartPanel){
+        controls.onePrevious();
+        return;
+      }
+      if (twoPage && areSinglePages(a, b)){
+        model.loc.twoPage = true;
+        model.loc.aIdx = a;
+        model.loc.bIdx = b;
         model.once('updateBookLoc', function(event){
           resetView();
           displayTwoPages(a, b);
@@ -57,6 +64,42 @@ function overwriteControls(model, controls){
         resetView();
         model.goToLocation(b, 0);
       }
+    }
+  });
+
+  /* Monitor if panel view is activated */
+  controls.on('change:smartPanel', function(c){
+    if (c.attributes.smartPanel){
+      /* Entering panel view */
+      model.goToLocation(model.loc.leftIdx, 0);
+      resetView();
+    }else{
+      /* Exiting panel view */
+      var a = model.loc.pageIdx;
+      var b = Math.min(a + 1, pages.length - 1);
+      if (twoPage && areSinglePages(a, b)){
+        model.once('updateBookLoc', function(event){
+          resetView();
+          hidePanels();
+          displayTwoPages(a, b);
+        });
+        model.goToLocation(b, 0);
+      }
+    }
+  });
+
+  controls.on('goDirectlyToPage', function(c){
+    var a = model.loc.pageIdx;
+    var b = Math.min(a + 1, pages.length - 1);
+    if (twoPage && areSinglePages(a, b)){
+      model.once('updateBookLoc', function(event){
+        resetView();
+        hidePanels();
+        displayTwoPages(a, b);
+      });
+      model.goToLocation(b, 0);
+    }else{
+      resetView();
     }
   });
 }
@@ -70,28 +113,51 @@ function resetView(){
   });
 }
 
-function hidePanels(){
+function hidePages(){
   j3('svg.leftPage, svg.rightPage').addClass('hidePage');
 }
+
+function hidePanels(){
+  j3('svg').each(function(index, value){
+    var height = value.viewBox.baseVal.height;
+    var width = value.viewBox.baseVal.width;
+
+    var img = j3(value).find('image')[0];
+    if (img != undefined){
+      var imgH = img.height.baseVal.value;
+      var imgW = img.width.baseVal.value;
+      if (imgH == 0 || imgW == 0){
+        return;
+      }else if (imgH != height || imgW != width){
+        j3(value).addClass('hidePage');
+      }
+    }
+  })
+}
+function areSinglePages(a, b){
+  /* Check if pages at a and b are distinct and not splash pages or covers*/
+  if (a==0 || a == b){
+    return false;
+  }
+  return (!pages[a].splashPage && !pages[b].splashPage);
+}
+
 function displayTwoPages(a, b){
-  resetView();
-  var firstPage, secondPage;
-  /*
-  var firstPage = j3('svg[style*="left: -100%"]');
-  var secondPage = j3('svg[style*="display: block"]');
-  */
+  //resetView();
+  /* Very occasionally, an image can be loaded in more than one svg */
+  var firstPage = j3(null);
+  var secondPage = j3(null);
   j3('svg image').each(function(index, value){
     if (j3(value).attr('href') == pages[a].url){
-      firstPage = j3(value).parent();
+      firstPage = firstPage.add(j3(value).parent());
     }else if (j3(value).attr('href') == pages[b].url){
-      secondPage = j3(value).parent();
+      secondPage = secondPage.add(j3(value).parent());
     }
   });
-
+  j3('div.thumbs[data-index="' + a + '"]').addClass('activePage');
   if (firstPage && secondPage){
     firstPage.attr('width', '50%');
     firstPage.attr('preserveAspectRatio', 'xMaxYMin meet');
-    //firstPage.find('rect').attr('x', '50%');
     secondPage.attr('width', '50%');
     secondPage.attr('preserveAspectRatio', 'xMinYMin meet');
     firstPage.addClass('leftPage');
