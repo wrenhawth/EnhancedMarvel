@@ -5,10 +5,12 @@ Enhanced Marvel is a chrome extension to add functionality to the Marvel Unlimit
 ## Features
 Currently it is very early in development, so it only supports two features. The first disables “Smart Panel” viewing by default (per personal preference) and the second enables a limited (and experimental) Two-Page view.
 
-The extension has no configuration options at the current time, so the Two-Page view will always be enabled (except for cover or splash pages). Smart Panel viewing can be re-enabled by clicking the icon, but will default to off whenever a new comic is loaded or the page is refreshed.
+The two features can be enabled or disabled as desired through the options dialog for Enhanced Marvel in the Chrome [extension menu](chrome://extensions/). To reflect changes to these options, any currently open comics will have to be reloaded.
 
 ## Usage
-It is too early for a development build currently, but the extension can be loaded as follows:
+You can download the latest released version of the extension on its  [page](https://chrome.google.com/webstore/detail/enhanced-marvel/epehnppgfdjaboceagobphhdecaonomi) in the Chrome Web Store.
+
+If you want the latest code, the extension can be loaded as follows:
 
 1. Download this repository as a zip file and unpack it.
 2. In the Chrome [extension menu](chrome://extensions/), enable “Developer Mode” if disabled.
